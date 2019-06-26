@@ -370,13 +370,13 @@ exports.forgotPassword = async (req, res) => {
         // const logoUrl = req.app.locals.base_url + '/' + constants.LOGO_IMG_URL + '/' + 'logo.png';
         if (!user) {
             return res.status(404).send({
-                status: constant.STATUS_CODE.NOT_FOUND,
+                status: constants.STATUS_CODE.NOT_FOUND,
                 message: message.email_not_found,
                 error: true,
                 data: {},
             });
         }
-        var token = jwt.sign({ email }, constant.JWT_SECRET).toString();
+        var token = jwt.sign({ email }, constants.JWT_SECRET).toString();
         user.reset_password_token = token;
         //add hours to check expire time
         user.reset_password_expires = moment().add(1, 'hours').format('X');
@@ -384,7 +384,7 @@ exports.forgotPassword = async (req, res) => {
         const mailUrl = keys.ANGULAR_BASE_URL;
     await sendEmail(email, 'Password Reset', forgotPasswordTemplate({ url: mailUrl + '/' + token, /*logo: logoUrl*/ }));
         res.status(200).send({
-            status: constant.STATUS_CODE.SUCCESS,
+            status: constants.STATUS_CODE.SUCCESS,
             message: message.forgotPassword_email_success,
             error: false,
             data: {}
@@ -392,7 +392,7 @@ exports.forgotPassword = async (req, res) => {
     } catch (error) {
         console.log(error)
         res.status(400).send({
-            status: constant.STATUS_CODE.FAIL,
+            status: constants.STATUS_CODE.FAIL,
             message: message.forgotPassword_email_fail,
             error: true,
             data: {},
@@ -404,7 +404,7 @@ exports.forgotUrl = async (req, res) => {
     try {
         if (!req.params.token) {
             return res.status(400).send({
-                status: constant.STATUS_CODE.FAIL,
+                status: constants.STATUS_CODE.FAIL,
                 message: message.general_error_content,
                 error: true,
                 data: {},
@@ -415,14 +415,14 @@ exports.forgotUrl = async (req, res) => {
         var user = await User.findOne({ reset_password_token, reset_password_expires: { $gte: currentTime } });
         if (!user) {
             return res.status(400).send({
-                status: constant.STATUS_CODE.FAIL,
+                status: constants.STATUS_CODE.FAIL,
                 message: message.resetPassword_token_fail,
                 error: true,
                 data: {},
             });
         }
         res.status(200).send({
-            status: constant.STATUS_CODE.SUCCESS,
+            status: constants.STATUS_CODE.SUCCESS,
             message: message.resetPassword_token_success,
             error: false,
             data: {},
@@ -430,7 +430,7 @@ exports.forgotUrl = async (req, res) => {
     }
     catch (error) {
         res.status(400).send({
-            status: constant.STATUS_CODE.FAIL,
+            status: constants.STATUS_CODE.FAIL,
             message: message.general_error_content,
             error: true,
             data: {},
@@ -453,7 +453,7 @@ exports.setNewPassword = async (req, res) => {
         });
         if (!user) {
             return res.status(401).send({
-                status: constant.STATUS_CODE.FAIL,
+                status: constants.STATUS_CODE.FAIL,
                 message: message.set_new_password_fail,
                 error: true,
                 data: {
@@ -468,7 +468,7 @@ exports.setNewPassword = async (req, res) => {
         user.updated_at = dateFormat.set_current_timestamp();
         await user.save();
         res.status(200).send({
-            status: constant.STATUS_CODE.SUCCESS,
+            status: constants.STATUS_CODE.SUCCESS,
             message: message.set_new_password_success,
             error: true,
             data: {
@@ -479,7 +479,7 @@ exports.setNewPassword = async (req, res) => {
     catch (error) {
         console.log(error);
         res.status(400).send({
-            status: constant.STATUS_CODE.FAIL,
+            status: constants.STATUS_CODE.FAIL,
             message: message.general_error_content,
             error: true,
             data: {},
