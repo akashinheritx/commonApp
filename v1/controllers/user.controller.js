@@ -12,7 +12,6 @@ const forgotPasswordTemplate = require('../../services/emailTemplate/forgotPassw
 const jwt = require('jsonwebtoken');
 const moment = require('moment');
 const keys = require('../../keys/keys');
-const constants = require('../../config/constants')
 
 const Message = commonMessage.MESSAGE;
 
@@ -368,7 +367,7 @@ exports.forgotPassword = async (req, res) => {
     try {
         let email = req.body.email;
         var user = await User.findOne({ email, deleted_at: null });
-        const logoUrl = req.app.locals.base_url + '/' + constant.LOGO_IMG_URL + '/' + 'logo.png';
+        // const logoUrl = req.app.locals.base_url + '/' + constants.LOGO_IMG_URL + '/' + 'logo.png';
         if (!user) {
             return res.status(404).send({
                 status: constant.STATUS_CODE.NOT_FOUND,
