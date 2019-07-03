@@ -1,8 +1,11 @@
 const bcrypt = require('bcryptjs');
+const decode = require('jwt-decode')
 const constants = require('../config/constants');
 const commonMessage = require('../helper/commonMessage.helper');
 const Message = commonMessage.MESSAGE;
 const jwt = require('jsonwebtoken');
+const keys = require('../keys/keys');
+const dateFormat = require('../helper/dateFormate.helper');
 
 const multipleDeviceLogin = constants.MULTIPLE_DEVICE_LOGIN || false;
 const singleDeviceOnLoginLogOutOtherDevice = false;
@@ -23,8 +26,8 @@ const userSchema = new mongoose.Schema({
 		required: true
 	},
 	gender: {
-		type: Number,
-		default : 0
+		type: String,
+		default : null,
 	},
 	dob: {
 		type: String,
@@ -119,9 +122,11 @@ userSchema.statics.deviceLogin = async function (token) {
 }
 
 // for generating token
-userSchema.methods.generateToken = async function () {
+userSchema.methods.generateToken = async function (value) {
 	const user = this;
-	const token = await jwt.sign({ _id: user._id.toString() }, constants.JWT_SECRET);
+	const token = await jwt.sign({ _id: user._id.toString() }, keys.JWT_SECRET,{
+		expiresIn: value
+	  });
 	//all multiple device to login with same credential
 	if(multipleDeviceLogin){
 		user.tokens = user.tokens.concat({ token });
@@ -135,11 +140,23 @@ userSchema.methods.generateToken = async function () {
 			await user.save();
 			return token;
 		}else{
-			//if token not exist then add token else same token will remail as it is.
+			//if token not exist then add token else same token will remain as it is.
 			if(((user.tokens).length) == 0){
 				user.tokens = user.tokens.concat({ token });
 				await user.save();
 				return token;
+			}else if(user.tokens.length>0){
+			const decoded = decode(user.tokens[0].token)
+			currentTime = await dateFormat.set_current_timestamp_in_seconds();
+			console.log(decoded.exp < currentTime);
+			if(decoded.exp < currentTime){
+				user.tokens = [];
+				user.tokens = user.tokens.concat({ token });
+				await user.save();
+				return token;
+			}else{
+				//if token is not esxpired then it will come here
+			}
 			}
 		}
 	}

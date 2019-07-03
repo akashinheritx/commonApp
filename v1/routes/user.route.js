@@ -13,8 +13,12 @@ router.get('/get-user-profile', auth, userController.getUserProfile);
 router.post('/update-user-profile', auth, profileUpload, userController.updateUserProfile);
 router.post('/forgot-password', forgetPasswordSchema, userController.forgotPassword);
 router.get('/reset-password/:token*?', userController.forgotUrl);
-router.post('/set-password', setNewPasswordSchema, userController.setNewPassword);
+router.post('/set-password', userController.setNewPassword);
 router.post('/logout', auth, userController.logoutSingleDevice);
 router.post('/logout-all', auth, userController.logoutAllDevice);
+
+router.post('/forgot-password-with-otp', forgetPasswordSchema, userController.sendOtp);
+router.post('/set-new-password-with-otp', userController.setNewPasswordByOTP);
+
 
 module.exports = router;

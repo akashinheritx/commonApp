@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const constants = require('../config/constants');
 const commonMessage = require('../helper/commonMessage.helper');
+const keys = require('../keys/keys');
+
 const Message = commonMessage.MESSAGE;
 
 let auth = async function (req, res, next) {
@@ -12,7 +14,7 @@ let auth = async function (req, res, next) {
         if (!token) {
             throw new Error('No token provided.');
         }
-        const decoded = jwt.verify(token, constants.JWT_SECRET);
+        const decoded = jwt.verify(token, keys.JWT_SECRET);
         
         const user = await User.findOne({ _id: decoded._id, 'tokens.token': token });
         

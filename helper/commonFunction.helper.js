@@ -41,3 +41,9 @@ exports.replaceStringWithObjectData = function(str, object){
 	}
 	return "";
 }
+
+//generate random otp
+exports.generateRandomOtp = function(){
+    otp = Math.floor((Math.random()*999999)+111111)
+    return otp;
+}

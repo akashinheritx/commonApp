@@ -9,6 +9,7 @@ const logService = require('../../services/log.service');
 const sendEmail = require('../../services/email.service');
 const accountCreatedTemplate = require('../../services/emailTemplate/accountCreatedTemplate');
 const forgotPasswordTemplate = require('../../services/emailTemplate/forgotPasswordTemplate');
+const forgotPasswordOtpTemplate = require('../../services/emailTemplate/forgotPasswordOtpTemplate');
 const jwt = require('jsonwebtoken');
 const moment = require('moment');
 const keys = require('../../keys/keys');
@@ -20,7 +21,7 @@ exports.userLogin = async (req, res) => {
     const { email, password } = req.body;
     try {
         const user = await User.findByCredential(email, password);
-
+        
         if (user.user_type !== constants.USER_TYPE.USER) {
             return res.status(400).send({
                 status: constants.STATUS_CODE.FAIL,
@@ -32,7 +33,7 @@ exports.userLogin = async (req, res) => {
 
         const devicelogin = await User.deviceLogin(user.tokens);
 
-        const token = await user.generateToken();
+        const token = await user.generateToken('2m');
 
         data = user;
         
@@ -112,7 +113,6 @@ exports.adminLogin = async (req, res) => {
 //register user and admin
 exports.register = async (req, res) => {
     try{
-        console.log(req.body)
         let reqdata = req.body;
 
         var isUserExist = await User.findOne({email: reqdata.email, deleted_at:null});
@@ -175,7 +175,7 @@ exports.register = async (req, res) => {
         let userdata = await user.save();
 
         await sendEmail(user.email, 'Welcome to App', accountCreatedTemplate({ email:reqdata.email, password:reqdata.password, first_name:reqdata.first_name, last_name:reqdata.last_name}))
-        console.log('email has been sent')
+        // console.log('email has been sent')
         
        
         return res.status(201).send({
@@ -363,7 +363,7 @@ exports.updateUserProfile = async (req, res) => {
     }
 }
 
-exports.forgotPassword = async (req, res) => {
+exports.sendOtp = async (req, res) => {
     try {
         let email = req.body.email;
         var user = await User.findOne({ email, deleted_at: null });
@@ -376,16 +376,17 @@ exports.forgotPassword = async (req, res) => {
                 data: {},
             });
         }
-        var token = jwt.sign({ email }, constants.JWT_SECRET).toString();
-        user.reset_password_token = token;
+        // var token = jwt.sign({ email }, keys.JWT_SECRET).toString();
+        
+        user.otp = await commonFunction.generateRandomOtp();
         //add hours to check expire time
-        user.reset_password_expires = moment().add(1, 'hours').format('X');
+        user.otp_expires = dateFormat.add_time_to_current_timestamp(1, 'hours');
         await user.save();
-        const mailUrl = keys.ANGULAR_BASE_URL;
-    await sendEmail(email, 'Password Reset', forgotPasswordTemplate({ url: mailUrl + '/' + token, /*logo: logoUrl*/ }));
+        const mailUrl = req.app.locals.base_url + '/api/v1/users/reset-password/';
+        await sendEmail(email, 'Check Your OTP', forgotPasswordOtpTemplate({ otp: user.otp, /*logo: logoUrl*/ }));
         res.status(200).send({
             status: constants.STATUS_CODE.SUCCESS,
-            message: message.forgotPassword_email_success,
+            message: Message.FORGOTPASSWORD_OTP_SUCCESS,
             error: false,
             data: {}
         });
@@ -393,7 +394,83 @@ exports.forgotPassword = async (req, res) => {
         console.log(error)
         res.status(400).send({
             status: constants.STATUS_CODE.FAIL,
-            message: message.forgotPassword_email_fail,
+            message: Message.FORGOTPASSWORD_OTP_FAIL,
+            error: true,
+            data: {},
+        });
+    }
+}
+
+//set new password with otp
+exports.setNewPasswordByOTP = async (req, res) => {
+    try {
+        const { otp, new_password } = req.body;
+        // let currentDate = moment().format();
+        let currentDate = await dateFormat.set_current_timestamp();
+        
+        
+        //check token with expire time
+        var user = await User.findOne({ otp, otp_expires: { $gte: currentDate } });       
+        console.log(user)
+        if (!user) {
+            res.status(404).send({
+                status: constants.STATUS_CODE.FAIL,
+                message: Message.USER_DETAILS_NOT_AVAILABLE,
+                error: true,
+                data: {},
+            });
+        }
+        user.password = await bcrypt.hash(new_password, 10);
+        user.otp = null;
+        user.updated_at = await dateFormat.set_current_timestamp();
+        await user.save();
+        res.status(200).send({
+            status: constants.STATUS_CODE.SUCCESS,
+            message: Message.PASSWORD_UPDATE_SUCCESS,
+            error: false,
+            data: {}
+        });
+    }catch (error) {
+        res.status(400).send({
+            status: constants.STATUS_CODE.FAIL,
+            message: Message.GENERAL_CATCH_MESSAGE,
+            error: true,
+            data: {},
+        });
+    }
+}
+
+exports.forgotPassword = async (req, res) => {
+    try {
+        let email = req.body.email;
+        var user = await User.findOne({ email, deleted_at: null });
+        // const logoUrl = req.app.locals.base_url + '/' + constants.LOGO_IMG_URL + '/' + 'logo.png';
+        if (!user) {
+            return res.status(404).send({
+                status: constants.STATUS_CODE.NOT_FOUND,
+                message: message.USER_DETAILS_NOT_AVAILABLE,
+                error: true,
+                data: {},
+            });
+        }
+        var token = jwt.sign({ email }, keys.JWT_SECRET).toString();
+        user.reset_password_token = token;
+        //add hours to check expire time
+        user.reset_password_expires = dateFormat.add_time_to_current_timestamp(1, 'hours');
+        await user.save();
+        const mailUrl = req.app.locals.base_url + '/api/v1/users/reset-password/';
+    await sendEmail(email, 'Password Reset', forgotPasswordTemplate({ url: mailUrl + token, /*logo: logoUrl*/ }));
+        res.status(200).send({
+            status: constants.STATUS_CODE.SUCCESS,
+            message: Message.FORGOTPASSWORD_EMAIL_SUCCESS,
+            error: false,
+            data: {}
+        });
+    } catch (error) {
+        console.log(error)
+        res.status(400).send({
+            status: constants.STATUS_CODE.FAIL,
+            message: Message.FORGOTPASSWORD_EMAIL_FAIL,
             error: true,
             data: {},
         });
@@ -402,36 +479,35 @@ exports.forgotPassword = async (req, res) => {
 
 exports.forgotUrl = async (req, res) => {
     try {
-        if (!req.params.token) {
-            return res.status(400).send({
-                status: constants.STATUS_CODE.FAIL,
-                message: message.general_error_content,
-                error: true,
-                data: {},
-            });
+        if(req.params.token){
+            reset_password_token = req.params.token;
+            // let currentDate = moment().format();
+            let currentDate = await dateFormat.set_current_timestamp();
+            var user = await User.findOne({ reset_password_token, reset_password_expires: { $gte: currentDate } });
+            console.log(user);
+            
+            if (!user) {
+                req.flash('error','Your link has been expired.');
+            }
         }
-        reset_password_token = req.params.token;
-        let currentTime = dateFormat.set_current_timestamp();
-        var user = await User.findOne({ reset_password_token, reset_password_expires: { $gte: currentTime } });
-        if (!user) {
-            return res.status(400).send({
-                status: constants.STATUS_CODE.FAIL,
-                message: message.resetPassword_token_fail,
-                error: true,
-                data: {},
-            });
-        }
-        res.status(200).send({
-            status: constants.STATUS_CODE.SUCCESS,
-            message: message.resetPassword_token_success,
-            error: false,
-            data: {},
+        
+        res.render('forgotPassword',{
+            req: req,
+            error : req.flash("error"),
+		    success: req.flash("success"),
         });
+        // res.status(200).send({
+        //     status: constants.STATUS_CODE.SUCCESS,
+        //     message: Message.resetPassword_token_success,
+        //     error: false,
+        //     data: {},
+        // });
     }
     catch (error) {
+        console.log(error)
         res.status(400).send({
             status: constants.STATUS_CODE.FAIL,
-            message: message.general_error_content,
+            message: Message.general_error_content,
             error: true,
             data: {},
         });
@@ -439,51 +515,37 @@ exports.forgotUrl = async (req, res) => {
 }
 
 exports.setNewPassword = async (req, res) => {
-    backDURL = req.header('Referer') || '/';
-    backURL = req.app.locals.base_url + '/api/v1/users/reset-password/';
-    console.log(backURL)
+    backDURL=req.header('Referer') || '/';
+    backURL=req.app.locals.base_url + '/api/v1/users/reset-password';
     try {
         const { new_password, reset_password_token } = req.body;
-        const currentDate = dateFormat.set_current_timestamp();
-
-        //check token with expire time
-        var user = await User.findOne({
-            reset_password_token,
-            reset_password_expires: { $gte: currentDate }
-        });
-        if (!user) {
-            return res.status(401).send({
-                status: constants.STATUS_CODE.FAIL,
-                message: message.set_new_password_fail,
-                error: true,
-                data: {
-                    backURL
-                },
-            });
+        // let currentDate = moment().format();
+        let currentDate = await dateFormat.set_current_timestamp();
+        if(!reset_password_token){
+            req.flash('error','Your link has been expired.');
+            return res.redirect(backURL);
         }
-
-        user.password = new_password;
+        
+        //check token with expire time
+        var user = await User.findOne({ reset_password_token, reset_password_expires: { $gte: currentDate } });       
+        console.log(user)
+        if (!user) {
+            req.flash('error','Your link has been expired.');
+            console.log(backURL)
+            return res.redirect(backURL);
+        }
+        user.password = await bcrypt.hash(new_password, 10);
         user.reset_password_token = null;
-        user.reset_password_expires = null;
-        user.updated_at = dateFormat.set_current_timestamp();
+        user.updated_at = await dateFormat.set_current_timestamp();
         await user.save();
-        res.status(200).send({
-            status: constants.STATUS_CODE.SUCCESS,
-            message: message.set_new_password_success,
-            error: true,
-            data: {
-                backURL
-            },
-        });
+        req.flash('success','Your password has been reset successfully');
+        res.redirect(backURL);
     }
     catch (error) {
         console.log(error);
-        res.status(400).send({
-            status: constants.STATUS_CODE.FAIL,
-            message: message.general_error_content,
-            error: true,
-            data: {},
-        });
+        req.flash('error','Exception: '+error.message);
+        res.redirect(backURL);
+        //res.status(400).send({ message: 'Unable to reset password', error: true, e: error });
     }
 }
 

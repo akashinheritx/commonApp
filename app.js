@@ -6,6 +6,8 @@ const morgan = require('morgan')
 const cors = require('cors')
 const path = require('path');
 const bodyParser = require('body-parser');
+var flash = require('connect-flash');
+var cookie = require('cookie-session');
 
 const constants = require('./config/constants')
 const keys = require('./keys/keys')
@@ -24,6 +26,15 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 app.use(morgan('dev'));
+app.use(flash());
+
+app.use(cookie({
+    // Cookie config, take a look at the docs...
+    secret: 'I Love India...',
+    resave: false,
+    saveUninitialized: true,
+    cookie:{secure:true}
+}));
 
 //BASE_URL configuration
 app.locals.base_url = keys.BASE_URL+':'+keys.PORT;
@@ -42,6 +53,7 @@ app.use(function (req, res, next) {
 //setting for error message in environment
 if (env == 'development') {
     app.use((err, req, res, next) => {
+        console.log(err)
         res.status(err.status || 500).send({
             message: err.message,
             error: true,

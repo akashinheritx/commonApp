@@ -18,5 +18,9 @@ module.exports = {
 		'LOGOUT_FAILED' : 'User logout failed',		
 		'LOGOUT_SUCCESS' : 'User logout successfully',		
 		'MULTIPLE_DEVICE_LOGIN_NOT_ALLOWED' : 'Multiple device login are not allowed, please logout from device first',
+		'FORGOTPASSWORD_EMAIL_SUCCESS':'Email has been sent successfully.',
+		'FORGOTPASSWORD_EMAIL_FAIL':'Error while sending email.',
+		'FORGOTPASSWORD_OTP_SUCCESS': 'OTP has been sent successfully.',
+		'FORGOTPASSWORD_OTP_FAIL': 'Error while sending OTP.',
 	}
 }

@@ -5,7 +5,7 @@
 /node_modules
 /package-lock.json
 .env
-/public
+/public/images/
 /keys/production.keys.js
 /keys/development.keys.js
 

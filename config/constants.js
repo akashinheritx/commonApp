@@ -13,6 +13,7 @@ module.exports = {
 	'PROFILE_IMG_PATH': 'public/images/profile_pic',
 	'PROFILE_IMG_URL': 'images/profile_pic',
 	'ANGULAR_BASE_URL' : 'http://127.0.0.1:4200/reset-password',
+	'EMAIL_FROM':"admin@commonapp.com",
 	'USER_TYPE' : {
 		'ADMIN' : 1,
 		'USER' : 2

@@ -118,7 +118,7 @@ module.exports = emailpassword => {
             <tr>
               <td align="center" valign="top" >
                 <a href="<%=base_url%>" target="_blank" style="display: inline-block;">
-                  <img src="https://images.vexels.com/media/users/3/129333/isolated/preview/9ec32b2948c370b58ae56e43386ffb26-basketball-logo-by-vexels.png" alt="Logo" border="0" width="400" height:"150" style="display: block; width: 150px; max-width: 150px; min-width: 150px; height:150px">
+                  <img src="https://images.vexels.com/media/users/3/148383/raw/29544749ddb30c62e0e78d0bc5d52afe-electro-music-illustrated-poster.jpg" alt="Logo" border="0" width="400" height:"150" style="display: block; width: 150px; max-width: 150px; min-width: 150px; height:150px">
                 </a>
               </td>
             </tr>
