@@ -24,5 +24,6 @@ module.exports = {
 		'INACTIVE' : 0,
 		'ACTIVE' : 1
 	},
-	//'MULTIPLE_DEVICELOGIN' : true,
+	'MULTIPLE_DEVICE_LOGIN' : true,
+	'TOKEN_EXPIRE_TIME' : '2m',
 }

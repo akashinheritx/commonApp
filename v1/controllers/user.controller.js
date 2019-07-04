@@ -31,7 +31,7 @@ exports.userLogin = async (req, res) => {
             });
         }
 
-        const devicelogin = await User.deviceLogin(user.tokens);
+        const devicelogin = await User.checkSettingForDeviceLogin(user.tokens);
 
         const token = await user.generateToken('2m');
 
@@ -354,6 +354,12 @@ exports.updateUserProfile = async (req, res) => {
         });
 
     } catch (error) {
+
+        if(req.file){
+            profileImgPath = constants.PROFILE_IMG_PATH + '/' + req.file.filename;
+            await commonFunction.removeFile(profileImgPath);
+        }
+
         res.status(400).send({
             status: constants.STATUS_CODE.NOT_FOUND,
             message: Message.GENERAL_CATCH_MESSAGE,

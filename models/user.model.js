@@ -7,8 +7,9 @@ const jwt = require('jsonwebtoken');
 const keys = require('../keys/keys');
 const dateFormat = require('../helper/dateFormate.helper');
 
-const multipleDeviceLogin = constants.MULTIPLE_DEVICE_LOGIN || false;
+const allMultipleDeviceLogin = constants.MULTIPLE_DEVICE_LOGIN || false;
 const singleDeviceOnLoginLogOutOtherDevice = false;
+const tokenExpireTime = constants.TOKEN_EXPIRE_TIME || '365d';
 
 const userSchema = new mongoose.Schema({
 	first_name: {
@@ -112,9 +113,9 @@ userSchema.statics.findByCredential = async function (email, password) {
 }
 
 // device login 
-userSchema.statics.deviceLogin = async function (token) {
-	//restrinct user to login if setting for multidevice login is off
-    if(!multipleDeviceLogin){
+userSchema.statics.checkSettingForDeviceLogin = async function (token) {
+	//restrict user to login if setting for multidevice login is off
+    if(!allMultipleDeviceLogin){
         if(((token).length) > 1){
         	throw new Error(Message.MULTIPLE_DEVICE_LOGIN_NOT_ALLOWED);
         }
@@ -122,13 +123,13 @@ userSchema.statics.deviceLogin = async function (token) {
 }
 
 // for generating token
-userSchema.methods.generateToken = async function (value) {
+userSchema.methods.generateToken = async function () {
 	const user = this;
 	const token = await jwt.sign({ _id: user._id.toString() }, keys.JWT_SECRET,{
-		expiresIn: value
+		expiresIn: tokenExpireTime
 	  });
 	//all multiple device to login with same credential
-	if(multipleDeviceLogin){
+	if(allMultipleDeviceLogin){
 		user.tokens = user.tokens.concat({ token });
 		await user.save();
 		return token;
