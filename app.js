@@ -14,7 +14,7 @@ const keys = require('./keys/keys')
 const commonMessage = require('./helper/commonMessage.helper')
 const commonFunction = require('./helper/commonFunction.helper');
 
-const port = process.env.PORT || keys.PORT || 8090; // setting port
+const port = process.env.PORT || keys.PORT || 8181; // setting port
 const env = process.env.ENV || 'development'; //setting environment
 const mongoose = require('./database/mongoose.js'); // for database connection
 
@@ -42,6 +42,8 @@ app.locals.base_url = keys.BASE_URL+':'+keys.PORT;
 // version 1
 app.use('/api/v1/users',require('./v1/routes/user.route'));
 app.use('/api/v1/demo',require('./v1/routes/demo.route'));
+app.use('/api/v1/email', require('./v1/routes/emailTemplate.route'));
+app.use('/api/v1/sms', require('./v1/routes/smsTemplate.route'));
 
 //catch 404 and forward to error handler
 app.use(function (req, res, next) {

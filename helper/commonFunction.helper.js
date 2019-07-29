@@ -1,6 +1,7 @@
 const fs = require('fs')
 const gm = require('gm').subClass({imageMagick: true})
 var _ = require('lodash');
+const { validationResult } = require('express-validator');
 
 const constants = require('../config/constants');
 
@@ -47,3 +48,20 @@ exports.generateRandomOtp = function(){
     otp = Math.floor((Math.random()*999999)+111111)
     return otp;
 }
+
+// show validation error message
+exports.validatorFunc = (req, res, next) => {
+    let errArray = {};
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      
+      return res.status(422).send({
+          statusCode:constants.STATUS_CODE.VALIDATION,
+          message: errors.array()[0].msg,
+          error: true,
+          data:{}
+        });
+
+    }
+    next();
+  };

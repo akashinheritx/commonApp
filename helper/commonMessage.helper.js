@@ -22,5 +22,17 @@ module.exports = {
 		'FORGOTPASSWORD_EMAIL_FAIL':'Error while sending email.',
 		'FORGOTPASSWORD_OTP_SUCCESS': 'OTP has been sent successfully.',
 		'FORGOTPASSWORD_OTP_FAIL': 'Error while sending OTP.',
+		'TITLE_ALREADY_EXISTS': 'Title already exists.',
+		'EMAIL_FORMAT_CREATED_SUCCESS': 'Email format created successfully.',
+		'EMAIL_FORMAT_UPDATED_SUCCESS': 'Email format updated successfully.',
+		'NO_EMAIL_FORMAT_EXISTS': 'No email format exists.',
+		'EMAIL_TEMPLATE_RETRIEVE': 'Email Template retrieve successfully.',
+		'EMAIL_TEMPLATE_DELETED': 'Email Template deleted successfully.',
+		'SMS_TEMPLATE_CREATED_SUCCESS': 'SMS Template created successfully.',
+		'SMS_TEMPLATE_UPDATED_SUCCESS': 'SMS Template updated successfully.',
+		'NO_SMS_TEMPLATE_EXISTS': 'No SMS template exists.',
+		'NO_SMS_FORMAT_EXISTS': 'No SMS format exists.',
+		'SMS_TEMPLATE_RETRIEVE': 'SMS Template retrieve successfully.',
+		'SMS_TEMPLATE_DELETED': 'SMS Template deleted successfully.',
 	}
 }

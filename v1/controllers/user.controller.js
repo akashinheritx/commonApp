@@ -45,7 +45,7 @@ exports.userLogin = async (req, res) => {
             status: constants.STATUS_CODE.SUCCESS,
             message: Message.SUCCESSFULL_LOGIN,
             error: false,
-            data : data
+            data : data, token
         });
 
         logService.responseData(req, data);
@@ -112,6 +112,10 @@ exports.adminLogin = async (req, res) => {
 
 //register user and admin
 exports.register = async (req, res) => {
+    var session = await mongoose.startSession({
+        readPreference: { mode: 'primary' }
+      });
+      session.startTransaction();
     try{
         let reqdata = req.body;
 
@@ -166,17 +170,18 @@ exports.register = async (req, res) => {
             await commonFunction.resizeImage(profileImgPath);
         }
 
-        user.created_at = await dateFormat.set_current_timestamp();
-        user.updated_at = await dateFormat.set_current_timestamp();
-        user.actual_updated_at = await dateFormat.set_current_timestamp();
+        user.created_at = dateFormat.set_current_timestamp();
+        user.updated_at = dateFormat.set_current_timestamp();
+        user.actual_updated_at = dateFormat.set_current_timestamp();
 
         user.status = constants.STATUS.INACTIVE;
 
-        let userdata = await user.save();
+        let userdata = await user.save({session});
 
-        await sendEmail(user.email, 'Welcome to App', accountCreatedTemplate({ email:reqdata.email, password:reqdata.password, first_name:reqdata.first_name, last_name:reqdata.last_name}))
+        // await sendEmail(user.email, 'Welcome to App', accountCreatedTemplate({ email:reqdata.email, password:reqdata.password, first_name:reqdata.first_name, last_name:reqdata.last_name}))
         // console.log('email has been sent')
-        
+        await session.commitTransaction();
+        session.endSession();
        
         return res.status(201).send({
             status:constants.STATUS_CODE.SUCCESS,
@@ -189,6 +194,8 @@ exports.register = async (req, res) => {
 
     }catch(error){
         console.log(error)
+        await session.abortTransaction();
+        session.endSession();
         if(req.file){
             profileImgPath = constants.PROFILE_IMG_PATH+'/'+req.file.filename;
             await commonFunction.removeFile(profileImgPath);
@@ -465,7 +472,7 @@ exports.forgotPassword = async (req, res) => {
         user.reset_password_expires = dateFormat.add_time_to_current_timestamp(1, 'hours');
         await user.save();
         const mailUrl = req.app.locals.base_url + '/api/v1/users/reset-password/';
-    await sendEmail(email, 'Password Reset', forgotPasswordTemplate({ url: mailUrl + token, /*logo: logoUrl*/ }));
+        await sendEmail(email, 'Password Reset', forgotPasswordTemplate({ url: mailUrl + token, /*logo: logoUrl*/ }));
         res.status(200).send({
             status: constants.STATUS_CODE.SUCCESS,
             message: Message.FORGOTPASSWORD_EMAIL_SUCCESS,

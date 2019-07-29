@@ -39,6 +39,20 @@ mongoose.connection.on('connected', async () => {
 
 mongoose.connection.on('error', function (err) {
     console.log('Mongodb connection failed. ' + err);
+    mongoose.disconnect();
+});
+
+mongoose.connection.once('open', function() {
+	console.log('MongoDB connection opened!');
+});
+
+mongoose.connection.on('reconnected', function () {
+	console.log('MongoDB reconnected!');
+});
+
+mongoose.connection.on('disconnected', function() {
+	console.log('MongoDB disconnected!');
+	mongoose.connect(keys.MONGODB_URI, {server:{auto_reconnect:true}});
 });
 
 module.exports = mongoose;
