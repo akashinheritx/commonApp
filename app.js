@@ -44,6 +44,7 @@ app.use('/api/v1/users',require('./v1/routes/user.route'));
 app.use('/api/v1/demo',require('./v1/routes/demo.route'));
 app.use('/api/v1/email', require('./v1/routes/emailTemplate.route'));
 app.use('/api/v1/sms', require('./v1/routes/smsTemplate.route'));
+app.use('/api/v1/social', require('./v1/routes/social.route'))
 
 //catch 404 and forward to error handler
 app.use(function (req, res, next) {
