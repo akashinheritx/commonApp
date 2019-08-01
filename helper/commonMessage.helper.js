@@ -39,5 +39,8 @@ module.exports = {
 		'VERSION_NUMBER_CREATED_SUCCESS': 'Version Number created successfully.',
 		'NO_VERSION_DETAILS_EXISTS': 'No version details available.',
 		'VERSION_DETAIL_RETRIEVE': 'Version details retrieve successfully.',
+		'OPTIONAL_UPDATE':'This is an optional update.',
+		'FORCE_UPDATE':'This is a force update.',
+		'NO_UPDATE':'No update require.'
 	}
 }

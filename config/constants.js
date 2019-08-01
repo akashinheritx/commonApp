@@ -24,6 +24,11 @@ module.exports = {
 		'INACTIVE' : 0,
 		'ACTIVE' : 1
 	},
+	'VERSION_STATUS':{
+		'NO_UPDATE':0,
+		'OPTIONAL_UPDATE':1,
+		'FORCE_UPDATE':2
+	},
 	'MULTIPLE_DEVICE_LOGIN' : true,
 	'TOKEN_EXPIRE_TIME' : '365d',
 }

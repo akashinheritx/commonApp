@@ -52,7 +52,6 @@ exports.createVersion = async (req, res) => {
             //Send Notification
             var user = await User.find({deviceType:d_type});
             for(i=0;i<user.length;i++){
-                console.log(i);
                 if(user[i].deviceToken){
                     var message = 'Dear Mooer, There is new features availbale for this app please update your app.'
                     await notificationService.sendNotification(user[i]._id, message, 'Update App', user[i].deviceToken, user[i].deviceType);
@@ -108,6 +107,79 @@ exports.getAllVersionData = async (req, res) => {
         });
 
         logService.responseData(req, VersionData);
+
+    }catch(error){
+        console.log(error)
+        
+        res.status(400).send({
+            status:constants.STATUS_CODE.FAIL,
+            message: Message.GENERAL_CATCH_MESSAGE,
+            error: true,
+            data:{}
+        });
+
+        logService.responseData(req, error);
+    }
+}
+
+//get app version
+exports.getAppVersion = async (req, res) => {
+    try{
+        reqdata = req.body
+        d_type = new RegExp(reqdata.deviceType, 'i');
+        var versionData = await VersionNumber.aggregate([
+            { $match:{deviceType:d_type}},
+            { $group : { 
+                _id: null,
+                versionNumber: { $max : "$versionNumber" }
+                }
+            },
+            {$project:{
+                _id:0, versionNumber:1
+            }}
+        ]);
+
+        console.log(versionData);
+
+        highestVersionNum = versionData[0].versionNumber
+    
+        if(reqdata.versionNumber<highestVersionNum){
+           var updateVersionData = await VersionNumber.findOne({versionNumber:highestVersionNum, deviceType: d_type})
+
+            console.log(updateVersionData.isForceUpdate);
+
+            if(updateVersionData.isForceUpdate == 0){
+                //optional update status
+                var status = constants.VERSION_STATUS.OPTIONAL_UPDATE
+                res.status(200).send({
+                    status:constants.STATUS_CODE.SUCCESS,
+                    message: Message.OPTIONAL_UPDATE,
+                    error: false,
+                    data : {status}
+                });
+                logService.responseData(req, updateVersionData);
+            }else if(updateVersionData.isForceUpdate == 1){
+                //force update status
+                var status = constants.VERSION_STATUS.FORCE_UPDATE
+                res.status(200).send({
+                    status:constants.STATUS_CODE.SUCCESS,
+                    message: Message.FORCE_UPDATE,
+                    error: false,
+                    data : {status}
+                });
+                logService.responseData(req, updateVersionData);
+            }
+        }else{
+            //no update status
+            var status = constants.VERSION_STATUS.NO_UPDATE
+            res.status(200).send({
+                status:constants.STATUS_CODE.SUCCESS,
+                message: Message.NO_UPDATE,
+                error: false,
+                data : {status}
+            });
+            logService.responseData(req, updateVersionData);
+        }
 
     }catch(error){
         console.log(error)

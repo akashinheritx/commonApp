@@ -6,5 +6,6 @@ const auth = require('../../middleware/auth.middleware');
 
 router.post('/createVersionNumber', auth, version_validator, validatorFunc, versionController.createVersion);
 router.get('/getAllVersionNumber', auth, versionController.getAllVersionData);
+router.post('/getAppVersion', auth, versionController.getAppVersion);
 
 module.exports = router;
