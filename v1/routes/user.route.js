@@ -1,5 +1,4 @@
 const router = express.Router();
-const User = require('../../models/user.model');
 const { loginSchema, forgetPasswordSchema, setNewPasswordSchema } = require('../../middleware/validator');
 const {register_validator} = require('../../middleware/register.validator');
 const {validatorFunc} = require('../../helper/commonFunction.helper');

@@ -34,5 +34,10 @@ module.exports = {
 		'NO_SMS_FORMAT_EXISTS': 'No SMS format exists.',
 		'SMS_TEMPLATE_RETRIEVE': 'SMS Template retrieve successfully.',
 		'SMS_TEMPLATE_DELETED': 'SMS Template deleted successfully.',
+		'VERSION_ALREADY_EXISTS': 'Version already exists.',
+		'VERSION_NUMBER_LOWER':'Version Number can\'t be lower than the exists one.',
+		'VERSION_NUMBER_CREATED_SUCCESS': 'Version Number created successfully.',
+		'NO_VERSION_DETAILS_EXISTS': 'No version details available.',
+		'VERSION_DETAIL_RETRIEVE': 'Version details retrieve successfully.',
 	}
 }

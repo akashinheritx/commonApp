@@ -80,6 +80,16 @@ const userSchema = new mongoose.Schema({
 		type: Number,
 		default: 0
 	},
+	deviceToken: {
+        type: String,
+        require: true,
+        default: null
+    },
+    deviceType: {
+        type: String,
+        require: true,
+        default: null
+    },
 	tokens: [{
 		token: {
 			type: String,

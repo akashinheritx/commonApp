@@ -78,7 +78,7 @@ exports.adminLogin = async (req, res) => {
             });
         }
         
-        const devicelogin = await User.deviceLogin(user.tokens);
+        // const devicelogin = await User.deviceLogin(user.tokens);
         
         const token = await user.generateToken();
         user.tokens.token = token;
@@ -173,6 +173,8 @@ exports.register = async (req, res) => {
         user.created_at = dateFormat.set_current_timestamp();
         user.updated_at = dateFormat.set_current_timestamp();
         user.actual_updated_at = dateFormat.set_current_timestamp();
+        user.deviceToken = reqdata.deviceToken;
+        user.deviceType = reqdata.deviceType;
 
         user.status = constants.STATUS.INACTIVE;
 
