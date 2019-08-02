@@ -180,8 +180,10 @@ exports.register = async (req, res) => {
 
         let userdata = await user.save({session});
 
-        // await sendEmail(user.email, 'Welcome to App', accountCreatedTemplate({ email:reqdata.email, password:reqdata.password, first_name:reqdata.first_name, last_name:reqdata.last_name}))
-        // console.log('email has been sent')
+        var logoURL = req.app.locals.base_url+'/'+constants.COMMONAPP_LOGO+'/'+constants.COMMONAPP_LOGO_IMAGE;
+
+        await sendEmail(user.email, 'Welcome to App', accountCreatedTemplate({ email:reqdata.email, password:reqdata.password, first_name:reqdata.first_name, last_name:reqdata.last_name, logoURL: logoURL}))
+        console.log('email has been sent')
         await session.commitTransaction();
         session.endSession();
        
@@ -397,8 +399,10 @@ exports.sendOtp = async (req, res) => {
         //add hours to check expire time
         user.otp_expires = dateFormat.add_time_to_current_timestamp(1, 'hours');
         await user.save();
-        const mailUrl = req.app.locals.base_url + '/api/v1/users/reset-password/';
-        await sendEmail(email, 'Check Your OTP', forgotPasswordOtpTemplate({ otp: user.otp, /*logo: logoUrl*/ }));
+        // const mailUrl = req.app.locals.base_url + '/api/v1/users/reset-password/';
+        var logoURL = req.app.locals.base_url+'/'+constants.COMMONAPP_LOGO+'/'+constants.COMMONAPP_LOGO_IMAGE;
+        await sendEmail(email, 'Check Your OTP', forgotPasswordOtpTemplate({ otp: user.otp, logoURL: logoURL }));
+        
         res.status(200).send({
             status: constants.STATUS_CODE.SUCCESS,
             message: Message.FORGOTPASSWORD_OTP_SUCCESS,
@@ -473,8 +477,12 @@ exports.forgotPassword = async (req, res) => {
         //add hours to check expire time
         user.reset_password_expires = dateFormat.add_time_to_current_timestamp(1, 'hours');
         await user.save();
+
         const mailUrl = req.app.locals.base_url + '/api/v1/users/reset-password/';
-        await sendEmail(email, 'Password Reset', forgotPasswordTemplate({ url: mailUrl + token, /*logo: logoUrl*/ }));
+        var logoURL = req.app.locals.base_url+'/'+constants.COMMONAPP_LOGO+'/'+constants.COMMONAPP_LOGO_IMAGE;
+
+        await sendEmail(email, 'Password Reset', forgotPasswordTemplate({ url: mailUrl + token, logoURL: logoURL }));
+        
         res.status(200).send({
             status: constants.STATUS_CODE.SUCCESS,
             message: Message.FORGOTPASSWORD_EMAIL_SUCCESS,
@@ -508,15 +516,10 @@ exports.forgotUrl = async (req, res) => {
         
         res.render('forgotPassword',{
             req: req,
+            constants: constants,
             error : req.flash("error"),
 		    success: req.flash("success"),
         });
-        // res.status(200).send({
-        //     status: constants.STATUS_CODE.SUCCESS,
-        //     message: Message.resetPassword_token_success,
-        //     error: false,
-        //     data: {},
-        // });
     }
     catch (error) {
         console.log(error)

@@ -126,7 +126,9 @@ exports.getAllVersionData = async (req, res) => {
 exports.getAppVersion = async (req, res) => {
     try{
         reqdata = req.body
+
         d_type = new RegExp(reqdata.deviceType, 'i');
+        
         var versionData = await VersionNumber.aggregate([
             { $match:{deviceType:d_type}},
             { $group : { 
@@ -139,44 +141,40 @@ exports.getAppVersion = async (req, res) => {
             }}
         ]);
 
-        console.log(versionData);
-
         highestVersionNum = versionData[0].versionNumber
     
         if(reqdata.versionNumber<highestVersionNum){
            var updateVersionData = await VersionNumber.findOne({versionNumber:highestVersionNum, deviceType: d_type})
 
-            console.log(updateVersionData.isForceUpdate);
-
             if(updateVersionData.isForceUpdate == 0){
                 //optional update status
-                var status = constants.VERSION_STATUS.OPTIONAL_UPDATE
+                var updateStatus = constants.VERSION_STATUS.OPTIONAL_UPDATE
                 res.status(200).send({
                     status:constants.STATUS_CODE.SUCCESS,
                     message: Message.OPTIONAL_UPDATE,
                     error: false,
-                    data : {status}
+                    data : {updateStatus}
                 });
                 logService.responseData(req, updateVersionData);
             }else if(updateVersionData.isForceUpdate == 1){
                 //force update status
-                var status = constants.VERSION_STATUS.FORCE_UPDATE
+                var updateStatus = constants.VERSION_STATUS.FORCE_UPDATE
                 res.status(200).send({
                     status:constants.STATUS_CODE.SUCCESS,
                     message: Message.FORCE_UPDATE,
                     error: false,
-                    data : {status}
+                    data : {updateStatus}
                 });
                 logService.responseData(req, updateVersionData);
             }
         }else{
             //no update status
-            var status = constants.VERSION_STATUS.NO_UPDATE
+            var updateStatus = constants.VERSION_STATUS.NO_UPDATE
             res.status(200).send({
                 status:constants.STATUS_CODE.SUCCESS,
                 message: Message.NO_UPDATE,
                 error: false,
-                data : {status}
+                data : {updateStatus}
             });
             logService.responseData(req, updateVersionData);
         }

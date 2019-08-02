@@ -1,5 +1,5 @@
 //Template for forget password otp
-module.exports = forgetpasswordotp => {
+module.exports=forgetpasswordotp=>{
   return `
   <!DOCTYPE html>
   <html>
@@ -7,7 +7,6 @@ module.exports = forgetpasswordotp => {
   
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style type="text/css">
     /**
@@ -99,39 +98,39 @@ module.exports = forgetpasswordotp => {
   
     <!-- start preheader -->
     <div class="preheader" style="display: none; max-width: 0; max-height: 0; overflow: hidden; font-size: 1px; line-height: 1px; color: #fff; opacity: 0;">
-      This is your credentials for app, dont share with anyone.
+      This is your reset password link, update it.
     </div>
     <!-- end preheader -->
   
     <!-- start body -->
     <table border="0" cellpadding="0" cellspacing="0" width="100%">
-    
-    <!-- start logo -->
-    <tr>
-      <td align="center" bgcolor="#e9ecef">
-        <!--[if (gte mso 9)|(IE)]>
-        <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
-        <tr>
-        <td align="center" valign="top" width="600">
-        <![endif]-->
-        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+  
+      <!-- start logo -->
+      <tr>
+        <td align="center" bgcolor="#e9ecef">
+          <!--[if (gte mso 9)|(IE)]>
+          <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
           <tr>
-            <td align="center" valign="top" >
-              <a href="<%=base_url%>" target="_blank" style="display: inline-block;">
-                <img src="https://images.vexels.com/media/users/3/148383/raw/29544749ddb30c62e0e78d0bc5d52afe-electro-music-illustrated-poster.jpg" alt="Logo" border="0" width="400" height:"150" style="display: block; width: 150px; max-width: 150px; min-width: 150px; height:150px">
-              </a>
-            </td>
+          <td align="center" valign="top" width="600">
+          <![endif]-->
+          <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+            <tr>
+              <td align="center" valign="top" >
+                <a href="<%=base_url%>" target="_blank" style="display: inline-block;">
+                  <img src="${forgetpasswordotp.logoURL}" alt="Logo" border="0" width="400" height:"150" style="display: block; width: 150px; max-width: 150px; min-width: 150px; height:150px">
+                </a>
+              </td>
+            </tr>
+          </table>
+          <!--[if (gte mso 9)|(IE)]>
+          </td>
           </tr>
-        </table>
-        <!--[if (gte mso 9)|(IE)]>
+          </table>
+          <![endif]-->
         </td>
-        </tr>
-        </table>
-        <![endif]-->
-      </td>
-    </tr>
-    <!-- end logo -->
-
+      </tr>
+      <!-- end logo -->
+  
       <!-- start hero -->
       <tr>
         <td align="center" bgcolor="#e9ecef">
@@ -140,6 +139,13 @@ module.exports = forgetpasswordotp => {
           <tr>
           <td align="center" valign="top" width="600">
           <![endif]-->
+          <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+            <tr>
+              <td align="left" bgcolor="#ffffff" style="padding: 36px 24px 0; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; border-top: 3px solid #d4dadf;">
+                <h1 style="margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -1px; line-height: 48px;">Reset Your Password</h1>
+              </td>
+            </tr>
+          </table>
           <!--[if (gte mso 9)|(IE)]>
           </td>
           </tr>
@@ -148,14 +154,22 @@ module.exports = forgetpasswordotp => {
         </td>
       </tr>
       <!-- end hero -->
-    
-            <!-- start copy -->
+  
+      <!-- start copy block -->
+      <tr>
+        <td align="center" bgcolor="#e9ecef">
+          <!--[if (gte mso 9)|(IE)]>
+          <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
+          <tr>
+          <td align="center" valign="top" width="600">
+          <![endif]-->
+          <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+  
+          <!-- start copy -->
             <tr>
               <td align="left" bgcolor="#ffffff" style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
-               <p> This is your one time password to reset your Password:
-               
-               <p style="margin: 0;"><b>OTP :</b> ${forgetpasswordotp.otp}</p>
-               
+              <p> This is your one time password to reset your Password:
+              <p style="margin: 0;"><b>OTP :</b> ${forgetpasswordotp.otp}</p>
               </td>
             </tr>
             <!-- end copy -->
@@ -163,7 +177,7 @@ module.exports = forgetpasswordotp => {
             <!-- start copy -->
             <tr>
               <td align="left" bgcolor="#ffffff" style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; border-bottom: 3px solid #d4dadf">
-                <p style="margin: 0;">Thank you,<br> App Team </p>
+                <p style="margin: 0;">Warm Regards,<br> App Team </p>
               </td>
             </tr>
             <!-- end copy -->
@@ -183,4 +197,4 @@ module.exports = forgetpasswordotp => {
   </body>
   </html>
   `;
-};
+}
