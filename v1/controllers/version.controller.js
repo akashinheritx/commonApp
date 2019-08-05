@@ -6,6 +6,7 @@ const commonMessage = require('../../helper/commonMessage.helper');
 const commonFunction = require('../../helper/commonFunction.helper');
 const notificationService = require('../../services/notification');
 const logService = require('../../services/log.service');
+const messageService = require('../../services/sendMessage.service')
 const Message = commonMessage.MESSAGE;
 
 //create Version
@@ -54,8 +55,15 @@ exports.createVersion = async (req, res) => {
             for(i=0;i<user.length;i++){
                 if(user[i].deviceToken){
                     var message = 'Dear Mooer, There is new features availbale for this app please update your app.'
+                    
+                    //Notification
                     await notificationService.sendNotification(user[i]._id, message, 'Update App', user[i].deviceToken, user[i].deviceType);
                     console.log('notification send');                    
+                    
+                    //SMS
+                    console.log('here', user[i].mobile_number);
+                    await messageService.sendMessage(user[i].mobile_number, `${message}`)
+                    console.log('sms send');
                 }else{
                     console.log('device token not available');
                 }

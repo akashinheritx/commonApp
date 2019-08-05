@@ -37,6 +37,7 @@
     "passport-facebook-token": "^3.3.0",
     "passport-google-plus-token": "^2.1.0",
     "twilio": "^3.33.0",
+    "urlencode": "^1.1.0",
     "winston": "^3.2.1"
   }
 }
